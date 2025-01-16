@@ -756,6 +756,8 @@ class get_need_equip(Module):
         like_unit_only: bool = self.get_config("like_unit_only")
 
         demand = list(client.data.get_equip_demand_gap(start_rank=start_rank, like_unit_only=like_unit_only).items())
+        
+        demand = [d for d in demand if d[1] > -0]
 
         demand = sorted(demand, key=lambda x: x[1], reverse=True)
 
