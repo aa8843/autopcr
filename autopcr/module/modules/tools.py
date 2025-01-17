@@ -783,11 +783,9 @@ class get_normal_quest_recommand(Module):
             id = quest_id[i]
             name = db.get_quest_name(id)
             tokens: List[ItemType] = [i for i in db.normal_quest_rewards[id]]
-            missing_tokens = [token for token in tokens if require_equip[token] > 0]
-            if missing_tokens:
-              msg = f"{name}:\n" + '\n'.join([
-                (f'{db.get_inventory_name_san(token)}: 缺少{require_equip[token]}片')
-                for token in missing_tokens])
+            msg = f"{name}:\n" + '\n'.join([
+                f'{db.get_inventory_name_san(token)}: 缺少{require_equip[token]}片'
+                for token in tokens if require_equip[token] > 0])
             tot.append(msg.strip())
 
         msg = '\n--------\n'.join(tot)
