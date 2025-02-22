@@ -300,7 +300,7 @@ class get_clan_support_unit(Module):
 
         for unit in client.data。dispatch_units:
             if unit.position == eClanSupportMemberType.CLAN_BATTLE_SUPPORT_UNIT_1 或 unit.position == eClanSupportMemberType.CLAN_BATTLE_SUPPORT_UNIT_2:
-                strongest, info = await client.serialize_unit_info(client.data。unit[unit.unit_id])
+                strongest, info = await client.serialize_unit_info(client.data.unit[unit.unit_id])
                 msg.append((unit.unit_id, strongest, client.user_name, info))
 
         msg = sorted(msg, key=lambda x:(x[0], -x[1]))
@@ -436,7 +436,7 @@ class jjc_back(Arena):
 
     def present_defend(self, defen: List[int]) -> str:
         msg = [db.get_unit_name(x) for x in defen]
-        msg = f"防守方【{' '.join(msg)}】"
+        msg = f"防守方【{' '。join(msg)}】"
         return msg
 
     def present_attack(self, attack: List[ArenaQueryResult]) -> str:
@@ -452,34 +452,34 @@ class jjc_back(Arena):
         star_change_unit = [unit_id for unit_id in units_id if client.data。unit[unit_id]。unit_rarity == 5 和 client.data。unit[unit_id]。battle_rarity != 0]
         if star_change_unit:
             res = [ChangeRarityUnit(unit_id=unit_id, battle_rarity=5) for unit_id in star_change_unit]
-            self._log(f"将{'|'。join([db.get_unit_name(unit_id) for unit_id in star_change_unit])}调至5星")
+            self._log(f"将{'|'.join([db.get_unit_name(unit_id) for unit_id in star_change_unit])}调至5星")
             await client.unit_change_rarity(res)
 
-        under_rank_bonus_unit = [unit for unit in units_id if client.data。unit[unit]。promotion_level < db.equip_max_rank - 1]
+        under_rank_bonus_unit = [unit for unit in units_id if client.data.unit[unit].promotion_level < db.equip_max_rank - 1]
         if under_rank_bonus_unit:
-            self._warn(f"无品级加成：{'，'。join([db.get_unit_name(unit_id) for unit_id in under_rank_bonus_unit])}")
+            self._warn(f"无品级加成：{'，'.join([db.get_unit_name(unit_id) for unit_id in under_rank_bonus_unit])}")
 
         await client.deck_update(ePartyType.ARENA, units_id)
 
     async def get_rank_info(self, client: pcrclient, rank: int) -> RankingSearchOpponent: 
-        for page in range(1， 6):
-            ranking = {info.rank: info for info in (await client.arena_rank(20, page))。ranking}
+        for page in range(1, 6):
+            ranking = {info.rank: info for info in (await client.arena_rank(20, page)).ranking}
             if rank in ranking:
                 return ranking[rank]
         raise AbortError("对手不在前100名，无法查询")
 
     async def get_opponent_info(self, client: pcrclient, viewer_id: int) -> RankingSearchOpponent: 
-        for page in range(1， 6):
-            ranking = {info.viewer_id: info for info in (await client.arena_rank(20, page))。ranking}
+        for page in range(1, 6):
+            ranking = {info.viewer_id: info for info in (await client.arena_rank(20, page)).ranking}
             if viewer_id in ranking:
                 return ranking[viewer_id]
         raise AbortError("对手不在前100名，无法查询")
 
     async def get_arena_history(self, client: pcrclient) -> List[VersusResult]:
-        return (await client.get_arena_history())。versus_result_list
+        return (await client.get_arena_history()).versus_result_list
 
     async def get_history_detail(self, log_id: int, client: pcrclient) -> VersusResultDetail:
-        return (await client.get_arena_history_detail(log_id))。versus_result_detail
+        return (await client.get_arena_history_detail(log_id)).versus_result_detail
 
     async def get_defend_from_info(self, info: RankingSearchOpponent) -> List[int]:
         return [unit.id for unit in info.arena_deck]
@@ -492,29 +492,29 @@ class jjc_back(Arena):
 
 @description('查询pjjc回刺阵容，并自动设置进攻队伍，对手排名=0则查找对战纪录第一条刺人的，<0则查找对战纪录，-1表示第一条，-2表示第二条，以此类推')
 @name('pjjc回刺查询')
-@默认(True)
-@inttype("opponent_pjjc_attack_team_id"， "选择阵容"， 1， [i for i in range(1， 10)])
-@inttype("opponent_pjjc_rank"， "对手排名", -1， [i for i in range(-20， 101)])
+@default(True)
+@inttype("opponent_pjjc_attack_team_id", "选择阵容", 1, [i for i in range(1, 10)])
+@inttype("opponent_pjjc_rank", "对手排名", -1, [i for i in range(-20, 101)])
 class pjjc_back(Arena):
     def target_rank(self) -> int:
         return self.get_config("opponent_pjjc_rank")
 
     def present_defend(self, defen: List[List[int]]) -> str:
-        msg = [' '。join([db.get_unit_name(y) for y in x]) for x in defen]
-        msg = '\n'。join(msg)
+        msg = [' '.join([db.get_unit_name(y) for y in x]) for x in defen]
+        msg = '\n'.join(msg)
         msg = f"防守方\n{msg}"
         return msg
 
     def present_attack(self, attack: List[List[ArenaQueryResult]]) -> str:
         msg = [f"第{id + 1}对策\n{ArenaQuery.str_result(x)}" for id, x in enumerate(attack)]
-        msg = '\n\n'。join(msg)
+        msg = '\n\n'.join(msg)
         return msg
 
     def get_rank_from_user_info(self, user_info: ProfileUserInfo) -> int:
         return user_info.grand_arena_rank 
 
     async def self_rank(self, client: pcrclient) -> int:
-        return (await client.get_grand_arena_info())。grand_arena_info。rank
+        return (await client.get_grand_arena_info()).grand_arena_info.rank
 
     async def choose_best_team(self, team: List[List[ArenaQueryResult]], rank_id: List[int], client: pcrclient) -> int:
         id = int(self.get_config("opponent_pjjc_attack_team_id")) - 1
@@ -523,17 +523,17 @@ class pjjc_back(Arena):
     async def update_deck(self, units: List[ArenaQueryResult], client: pcrclient):
         units_id = [[uni.id for uni in unit.atk] for unit in units]
         star_change_unit = [uni_id for unit_id in units_id for uni_id in unit_id if 
-                            client.data。unit[uni_id]。unit_rarity == 5 和 
-                            client.data。unit[uni_id]。battle_rarity != 0]
+                            client.data.unit[uni_id].unit_rarity == 5 and 
+                            client.data.unit[uni_id].battle_rarity != 0]
         if star_change_unit:
             res = [ChangeRarityUnit(unit_id=unit_id, battle_rarity=5) for unit_id in star_change_unit]
-            self._log(f"将{'|'。join([db.get_unit_name(unit_id) for unit_id in star_change_unit])}调至5星")
+            self._log(f"将{'|'.join([db.get_unit_name(unit_id) for unit_id in star_change_unit])}调至5星")
             await client.unit_change_rarity(res)
 
         under_rank_bonus_unit = [uni_id for unit_id in units_id for uni_id in unit_id if 
-                                 client.data。unit[uni_id]。promotion_level < db.equip_max_rank - 1]
+                                 client.data.unit[uni_id].promotion_level < db.equip_max_rank - 1]
         if under_rank_bonus_unit:
-            self._warn(f"无品级加成：{'，'。join([db.get_unit_name(unit_id) for unit_id in under_rank_bonus_unit])}")
+            self._warn(f"无品级加成：{'，'.join([db.get_unit_name(unit_id) for unit_id in under_rank_bonus_unit])}")
 
         deck_list = []
         for i, unit_id in enumerate(units_id):
@@ -652,12 +652,12 @@ class pjjc_info(ArenaInfo):
 @name('pjjc换防')
 class pjjc_shuffle_team(Module):
     async def do_task(self, client: pcrclient):
-        ids = random.choice([ [1， 2， 0]， [2， 0， 1] ])
+        ids = random.choice([ [1, 2, 0], [2, 0, 1] ])
         deck_list: List[DeckListData] = []
         cnt = 3
         for i in range(cnt):
             deck_number = getattr(ePartyType, f"GRAND_ARENA_DEF_{i + 1}")
-            units = client.data。deck_list[deck_number]
+            units = client.data.deck_list[deck_number]
             units_id = [getattr(units, f"unit_id_{i + 1}") for i in range(5)]
 
             deck = DeckListData()
@@ -667,7 +667,7 @@ class pjjc_shuffle_team(Module):
             deck_list.append(deck)
 
         deck_list.sort(key=lambda x: x.deck_number)
-        self._log('\n'。join([f"{i} -> {j}" for i, j in enumerate(ids)]))
+        self._log('\n'.join([f"{i} -> {j}" for i, j in enumerate(ids)]))
         await client.deck_update_list(deck_list)
 
 
@@ -843,7 +843,7 @@ class set_my_party(Module):
                         change_rarity = ChangeRarityUnit(unit_id=id, battle_rarity=star)
                         change_rarity_list.append(change_rarity)
                     else:
-                        self._warn(f"{title}：{unit[1]}星级无法{现在_star} -> {星标}")
+                        self._warn(f"{title}：{unit[1]}星级无法{现在_star} -> {star}")
                 unit_list.append(id)
 
             if change_rarity_list:
