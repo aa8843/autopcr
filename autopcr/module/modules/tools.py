@@ -19,7 +19,7 @@ import random
 from collections import Counter
 
 @name('撤下会战助战')
-@default(True)
+@默认(True)
 @description('拒绝内鬼练度')
 class remove_cb_support(Module):
     async def do_task(self, client: pcrclient):
@@ -29,32 +29,32 @@ class remove_cb_support(Module):
             if support.position in [eClanSupportMemberType.CLAN_BATTLE_SUPPORT_UNIT_1, eClanSupportMemberType.CLAN_BATTLE_SUPPORT_UNIT_2]:
                 remove = True
                 self._log(f"移除{db.get_unit_name(support.unit_id)}，已被借{support.clan_support_count}次")
-                await client.support_unit_change_setting(1, support.position, 2, support.unit_id)
+                await client.support_unit_change_setting(1, support.position， 2, support.unit_id)
         if not remove:
             raise SkipError("没有会战助战")
 
 @name('计算兑换角色碎片')
-@default(True)
-@booltype('redeem_unit_swap_do', '开换', False)
+@默认(True)
+@booltype('redeem_unit_swap_do'， '开换'， False)
 @description('计算兑换对应角色所需的3000碎片的最优使用方案，使得剩余碎片的盈余值的最大值最小')
 class redeem_unit_swap(Module):
     async def do_task(self, client: pcrclient):
         do = self.get_config('redeem_unit_swap_do')
 
         for unit_id in db.redeem_unit:
-            if unit_id in client.data.unit:
+            if unit_id in client.data。unit:
                 continue
-            gap = client.data.get_memory_demand_gap()
+            gap = client.data。get_memory_demand_gap()
             item = [k for k, v in gap.items() if v < 0] 
             self._log(f"{db.get_unit_name(unit_id)}")
             use_piece = 0
-            info = client.data.user_redeem_unit.get(unit_id, 
+            info = client.data。user_redeem_unit。get(unit_id, 
                                                     RedeemUnitInfo(unit_id = unit_id, 
                                                                    slot_info = [RedeemUnitSlotInfo(slot_id = i, register_num = 0) for i in db.redeem_unit[unit_id]]))
 
             for slot_id in db.redeem_unit[unit_id]:
                 if all(slot_info.slot_id != slot_id for slot_info in info.slot_info):
-                    info.slot_info.append(RedeemUnitSlotInfo(slot_id = slot_id, register_num = 0))
+                    info.slot_info。append(RedeemUnitSlotInfo(slot_id = slot_id, register_num = 0))
 
             for slot_info in info.slot_info:
                 db_info = db.get_redeem_unit_slot_info(unit_id,slot_info.slot_id)
@@ -766,7 +766,7 @@ class get_need_equip(Module):
 
         demand = sorted(demand, key=lambda x: x[1], reverse=True)
 
-        demand = filter(lambda item: item[1] > -100, demand)
+        demand = filter(lambda item: item[1] > 0, demand)
 
         msg = '\n'.join([f'{db.get_inventory_name_san(item[0])}: {"缺少" if item[1] > 0 else "盈余"}{abs(item[1])}片' for item in demand])
         self._log(msg)
@@ -794,7 +794,7 @@ class get_normal_quest_recommand(Module):
             msg = f"{name}:\n" + '\n'.join([
                 (f'{db.get_inventory_name_san(token)}: {"缺少" if require_equip[token] > 0 else "盈余"}{abs(require_equip[token])}片')
                 for token in tokens
-                if require_equip[token] > -100
+                if require_equip[token] > 0
                 ])
             tot.append(msg.strip())
 
@@ -837,7 +837,7 @@ class set_my_party(Module):
                 star = int(unit[3])
                 unit_data = client.data.unit[id]
                 can_change_star = unit_data.unit_rarity == 5
-                now_star = unit_data.battle_rarity if unit_data.battle_rarity else unit_data.unit_rarity
+                现在_star = unit_data.battle_rarity if unit_data.battle_rarity else unit_data.unit_rarity
                 if can_change_star and star != now_star:
                     if star >= 3 and star <= 5 and now_star >= 3 and now_star <= 5:
                         change_rarity = ChangeRarityUnit(unit_id=id, battle_rarity=star)
