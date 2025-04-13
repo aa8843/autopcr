@@ -808,7 +808,7 @@ class get_need_equip(Module):
 
         demand = sorted(demand, key=lambda x: x[1], reverse=True)
 
-        demand = filter(lambda item: item[1] > -100, demand)
+        demand = filter(lambda item: item[1] > 0, demand)
 
         msg = '\n'.join([f'{db.get_inventory_name_san(item[0])}: {"缺少" if item[1] > 0 else "盈余"}{abs(item[1])}片' for item in demand])
         self._log(msg)
@@ -836,7 +836,7 @@ class get_normal_quest_recommand(Module):
             msg = f"{name}:\n" + '\n'.join([
                 (f'{db.get_inventory_name_san(token)}: {"缺少" if require_equip[token] > 0 else "盈余"}{abs(require_equip[token])}片')
                 for token in tokens
-                if require_equip[token] > -100
+                if require_equip[token] > 0
                 ])
             tot.append(msg.strip())
 
