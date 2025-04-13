@@ -746,7 +746,7 @@ class get_need_memory(Module):
             msg = {(item.type, item.item_id): "已买" for item in master_shop.item_list if item.sold}
             demand = [i for i in demand if i[0] in master_shop_item]
 
-        msg = '\n'.join([f'{db.get_inventory_name_san(item[0])}: {"缺少" if item[1] > 0 else "盈余"}{abs(item[1])}片{("(" + msg[item[0]] + ")") if item[0] in msg else ""}' for item in demand])
+        msg = '\n'.join([f'{db.get_inventory_name_san(item[0])}: 缺少{abs(item[1])}片{("(" + msg[item[0]] + ")") if item[0] in msg else ""}' for item in demand if item[1] > 0])
         self._log(msg)
 
 @description('去除六星需求后，专二所需纯净碎片减去库存的结果')
@@ -765,7 +765,7 @@ class get_need_pure_memory(Module):
             own = -sum(pure_gap[db.unit_to_pure_memory[unit]] if unit in db.unit_to_pure_memory else 0 for unit in db.unit_kana_ids[kana])
             need_list.append(((eInventoryType.Unit, unit), target[kana] - own))
         msg = {}
-        msg = '\n'.join([f'{db.get_inventory_name_san(item[0])}: {"缺少" if item[1] > 0 else "盈余"}{abs(item[1])}片' for item in need_list])
+        msg = '\n'.join([f'{db.get_inventory_name_san(item[0])}: 缺少{abs(item[1])}片' for item in need_list if item[1] > 0])
         self._log(msg)
 
 @description('根据每个角色开专、升级至当前最高专所需的心碎减去库存的结果，大心转换成10心碎')
